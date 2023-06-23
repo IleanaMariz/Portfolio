@@ -45,7 +45,7 @@ WHERE continent IS NOT NULL
 GROUP BY continent
 ORDER BY highest_death_continent DESC
 
--- show precentage of deaths per cases
+-- show percentage of deaths per cases
 SELECT date, SUM(CAST(new_deaths AS FLOAT)) AS total_new_deaths, SUM(CAST(new_cases AS FLOAT)) AS total_new_cases, SUM(CAST(new_deaths AS FLOAT)) / NULLIF(SUM(CAST(new_cases AS FLOAT)),0)*100 AS percent_death_case
 FROM Portfolio..covid_deaths
 WHERE continent IS NOT NULL
