@@ -17,14 +17,42 @@ ORDER BY total_deaths DESC
 
 -- Table 3
 -- Percentage of population infected by Covid-19 virus per country
-SELECT location, population, MAX(total_cases) AS highest_case_count, MAX(CAST(total_cases AS FLOAT)/CAST(population AS FLOAT))*100 AS percent_population_infected
+SELECT location, population, MAX(total_cases) AS highest_case_count, MAX(CAST(total_cases AS FLOAT))/CAST(population AS FLOAT)*100 AS percent_population_infected
 FROM Portfolio..covid_deaths
 GROUP BY location, population
 ORDER BY percent_population_infected DESC
 
 -- Table 4
 -- Percentage of population infected by Covid-19 virus per day
-SELECT location, population, date, MAX(total_cases) AS highest_case_count, MAX(CAST(total_cases AS FLOAT)/CAST(population AS FLOAT))*100 AS percent_population_infected
+SELECT location, population, date, MAX(total_cases) AS highest_case_count, MAX(CAST(total_cases AS FLOAT))/CAST(population AS FLOAT)*100 AS percent_population_infected
 From Portfolio..covid_deaths
 GROUP BY location, population, date
 ORDER BY percent_population_infected DESC
+
+-- Table 5
+-- Percentage of population vaccinated against Covid-19 virus
+
+-- TEMPORARY TABLE
+DROP TABLE IF EXISTS percent_persons_vaccinated
+CREATE TABLE percent_persons_vaccinated
+(
+  Continent NVARCHAR(255),
+  Location NVARCHAR(255),
+  Date DATE,
+  Population FLOAT,
+  New_Vaccinations FLOAT,
+  Vaccinated_Persons_Count FLOAT
+)
+
+INSERT INTO percent_persons_vaccinated
+SELECT death.continent, death.location, death.date, death.population, vacc.new_vaccinations, SUM(CAST(vacc.new_vaccinations AS FLOAT)) OVER (PARTITION BY death.location ORDER BY death.location, death.date) AS vaccinated_persons_count
+FROM Portfolio..covid_deaths death
+INNER JOIN Portfolio..covid_vaccinations vacc
+ON death.location = vacc.location
+AND death.date = vacc.date
+WHERE death.continent IS NOT NULL
+
+SELECT *, (vaccinated_persons_count/population)*100 AS Percent_vaccinated_population
+FROM percent_persons_vaccinated
+ORDER BY location, population, date
+
