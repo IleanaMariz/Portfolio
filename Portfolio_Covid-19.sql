@@ -1,4 +1,4 @@
--- Effects of Covid-19 virus to humans
+-- Impacts of Covid-19 virus to human life
 
 -- Table 1
 -- The risk of dying if a person contracts the Covid-19 virus
@@ -43,15 +43,13 @@ CREATE TABLE percent_persons_vaccinated
   New_Vaccinations FLOAT,
   Vaccinated_Persons_Count FLOAT
 )
-
 INSERT INTO percent_persons_vaccinated
-SELECT death.continent, death.location, death.date, death.population, vacc.new_vaccinations, SUM(CAST(vacc.new_vaccinations AS FLOAT)) OVER (PARTITION BY death.location ORDER BY death.location, death.date) AS vaccinated_persons_count
+SELECT death.continent, death.location, death.date, death.population, vacc.new_vaccinations, MAX(CAST(vacc.people_fully_vaccinated AS FLOAT)) OVER (PARTITION BY death.location ORDER BY death.location, death.date) AS vaccinated_persons_count
 FROM Portfolio..covid_deaths death
 INNER JOIN Portfolio..covid_vaccinations vacc
 ON death.location = vacc.location
 AND death.date = vacc.date
 WHERE death.continent IS NOT NULL
-
 SELECT *, (vaccinated_persons_count/population)*100 AS Percent_vaccinated_population
 FROM percent_persons_vaccinated
 ORDER BY location, population, date
