@@ -1,4 +1,4 @@
--- Impacts of Covid-19 virus to human life
+-- Impacts of Covid-19 virus on mortality
 
 -- Table 1
 -- The risk of dying if a person contracts the Covid-19 virus
